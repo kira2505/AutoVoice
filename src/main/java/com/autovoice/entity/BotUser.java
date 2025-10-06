@@ -1,5 +1,6 @@
 package com.autovoice.entity;
 
+import com.autovoice.enums.Branch;
 import com.autovoice.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -22,15 +23,15 @@ public class BotUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Please provide your full name")
-    private String fullName;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @NotBlank(message = "Please indicate your branch")
-    private String branch;
+    @Enumerated(EnumType.STRING)
+    private Branch branch;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Feedback> feedbacks;
+
+    @Column(unique = true, nullable = false)
+    private Long chatId;
 }
