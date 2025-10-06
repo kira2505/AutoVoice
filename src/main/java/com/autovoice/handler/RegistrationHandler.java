@@ -24,6 +24,12 @@ public class RegistrationHandler {
     private final Map<Long, RegistrationStep> registrationStep = new ConcurrentHashMap<>();
 
     public SendMessage createRoleSelectionMessage(Long chatId) {
+        if(botUserService.existsByChatId(chatId) && botUserService.hasRole(chatId) != null) {
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId.toString());
+            message.setText("You have already selected a role 👌");
+            return message;
+        }
         registrationStep.put(chatId, RegistrationStep.ASK_ROLE);
         return createSelectionMessage(chatId, "\uD83D\uDC64 Select your role: ", Role.values());
     }
@@ -39,15 +45,15 @@ public class RegistrationHandler {
 
                 message = createSelectionMessage(chatId, "\uD83C\uDFE2 Select your branch: ",  Branch.values());
                 return message;
-
             } catch (IllegalArgumentException e) {
                 try {
                     Branch branch = Branch.valueOf(data);
                     botUserService.saveBranch(chatId, branch);
 
-                    message.setText("\uFE0F Please enter your message here: ");
-                    return message;
-
+                    SendMessage completed = new SendMessage();
+                    completed.setChatId(chatId.toString());
+                    message.setText("✅ Registration completed! Use the menu below \uD83D\uDC47");
+                    return completed;
                 } catch (IllegalArgumentException ex) {
                     message.setText("Wrong choice: " + data);
                     return message;

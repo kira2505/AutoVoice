@@ -28,9 +28,11 @@ public class BotUserServiceImpl implements BotUserService {
     @Override
     public void saveRole(long chatId, Role role) {
         BotUser botUser = botUserRepository.findByChatId(chatId).orElse(new  BotUser());
-        botUser.setChatId(chatId);
-        botUser.setRole(role);
-        botUserRepository.save(botUser);
+        if (botUser.getRole() == null) {
+            botUser.setChatId(chatId);
+            botUser.setRole(role);
+            botUserRepository.save(botUser);
+        }
     }
 
     @Override
@@ -43,5 +45,10 @@ public class BotUserServiceImpl implements BotUserService {
     @Override
     public void save(BotUser botUser) {
         botUserRepository.save(botUser);
+    }
+
+    @Override
+    public Role hasRole(Long chatId) {
+        return botUserRepository.findByChatId(chatId).map(BotUser::getRole).orElse(null);
     }
 }

@@ -6,13 +6,15 @@ import com.autovoice.enums.Role;
 
 public interface BotUserService {
 
-    public BotUser getByChatId(Long chatId);
+    BotUser getByChatId(Long chatId);
 
-    public boolean existsByChatId(Long chatId);
+    boolean existsByChatId(Long chatId);
 
-    public void save(BotUser botUser);
+    void save(BotUser botUser);
 
-    public void saveRole(long chatId, Role role);
+    void saveRole(long chatId, Role role);
 
-    public void saveBranch(long chatId, Branch branch);
+    void saveBranch(long chatId, Branch branch);
+
+    Role hasRole(Long chatId);
 }

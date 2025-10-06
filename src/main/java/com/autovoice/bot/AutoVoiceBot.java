@@ -11,7 +11,10 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -45,39 +48,51 @@ public class AutoVoiceBot extends TelegramLongPollingBot {
             String text = update.getMessage().getText();
             Long chatId = update.getMessage().getChatId();
 
-            if (text.equals("/start")) {
-                if (botUserService.existsByChatId(chatId)) {
-                    executeMessage(createMenuMessage(chatId));
+            switch (text) {
+                case "/start": {
+                    if (!botUserService.existsByChatId(chatId)) {
+                        executeMessage(registrationHandler.createRoleSelectionMessage(chatId));
+                    }
+                    break;
                 }
-                executeMessage(registrationHandler.createRoleSelectionMessage(chatId));
+                case "\uD83D\uDCDD Write feedback": {
+                    break;
+                }
+                case "\uD83D\uDCDD Send feedback": {
+                    break;
+                }
+                case "\uD83C\uDFE2 Change branch":
+                    SendMessage changeBranchMessage = registrationHandler.createSelectionMessage(
+                            chatId, "\uD83C\uDFE2 Choose new branch: ", Branch.values());
+                    executeMessage(changeBranchMessage);
+                    break;
             }
         }
-
-        if (update.hasCallbackQuery()) {
-            Long chatId = update.getCallbackQuery().getMessage().getChatId();
+        if(update.hasCallbackQuery()) {
             String data = update.getCallbackQuery().getData();
-            SendMessage message = registrationHandler.handleCallback(chatId, data);
+            Long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-            if (message != null) {
-                executeMessage(message);
+            SendMessage sendMessage = registrationHandler.handleCallback(chatId, data);
+            if(sendMessage != null) {
+                executeMessage(sendMessage);
             }
-            switch (data) {
-                case "MY_FEEDBACKS":
 
-                    break;
-                case "WRITE_FEEDBACK":
-
-                    break;
-                case "CHANGE_BRANCH":
-                    SendMessage changeBranchMessage = registrationHandler.createSelectionMessage(
-                        chatId, "\uD83C\uDFE2 Choose new branch: ", Branch.values());
-                    executeMessage(changeBranchMessage);
-                        break;
+            if (botUserService.existsByChatId(chatId) && botUserService.hasRole(chatId) != null) {
+                SendMessage menuMessage = new SendMessage(chatId.toString(), "📋 Main menu:");
+                menuMessage.setReplyMarkup(createPersistentKeyboard());
+                executeMessage(menuMessage);
             }
         }
     }
 
     private void executeMessage(SendMessage message) {
+        if (message == null || message.getText() == null) {
+            System.err.println("⚠️ Attempted to send null or empty message");
+            return;
+        }
+        if (message.getReplyMarkup() == null) {
+            message.setReplyMarkup(createPersistentKeyboard());
+        }
         try {
             execute(message);
         } catch (TelegramApiException e) {
@@ -85,34 +100,24 @@ public class AutoVoiceBot extends TelegramLongPollingBot {
         }
     }
 
-    public SendMessage createMenuMessage(Long chatId) {
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId.toString());
-        message.setText("Choose action:");
+    public ReplyKeyboardMarkup createPersistentKeyboard() {
+        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
+        markup.setResizeKeyboard(true);
+        markup.setSelective(true);
+        markup.setOneTimeKeyboard(false);
 
-        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<KeyboardRow> rows = new ArrayList<>();
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add(new KeyboardButton("\uD83D\uDCDD Write feedback"));
+        row1.add(new KeyboardButton("\uD83D\uDCCB My feedbacks"));
 
-        InlineKeyboardButton button1 = new InlineKeyboardButton();
-        button1.setText("\uD83D\uDCCB My feedbacks");
-        button1.setCallbackData("MY_FEEDBACKS");
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add(new KeyboardButton("\uD83C\uDFE2 Change branch"));
 
-        InlineKeyboardButton button2 = new InlineKeyboardButton();
-        button2.setText("\uFE0F Write feedback");
-        button2.setCallbackData("WRITE_FEEDBACK");
-
-        InlineKeyboardButton button3 = new InlineKeyboardButton();
-        button3.setText("\uD83C\uDFE2 Change branch");
-        button3.setCallbackData("CHANGE_BRANCH");
-
-
-        rows.add(List.of(button1));
-        rows.add(List.of(button2));
-        rows.add(List.of(button3));
+        rows.add(row1);
+        rows.add(row2);
 
         markup.setKeyboard(rows);
-        message.setReplyMarkup(markup);
-
-        return message;
+        return markup;
     }
 }
