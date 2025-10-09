@@ -1,12 +1,19 @@
-#spring.datasource.url=jdbc:postgresql:
-#spring.datasource.username=
-#spring.datasource.password=
-#spring.liquibase.change-log=classpath:
-#
-#telegram.bot.username=
-#telegram.bot.token=
-#
-#openai.api-key=
-#openai.base-url=
-#google.sheets.spreadsheet-id=
-#google.credentials.path=
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/autovoice
+    username: postgres
+    password: yourpassword
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+google:
+  sheets:
+    spreadsheet-id: YOUR_SPREADSHEET_ID
+    credentials-file: google-credentials.json
+
+telegram:
+  bot:
+    token: YOUR_TELEGRAM_BOT_TOKEN
+    username: YOUR_BOT_USERNAME
