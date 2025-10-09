@@ -1,6 +1,6 @@
 package com.autovoice.enums;
 
-public enum Role {
+public enum Position {
 
     MECHANIC("Mechanic"),
     ELECTRICIAN("Electrician"),
@@ -8,7 +8,7 @@ public enum Role {
 
     private final String displayName;
 
-    Role(String displayName) {
+    Position(String displayName) {
         this.displayName = displayName;
     }
 

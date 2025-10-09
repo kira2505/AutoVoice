@@ -1,0 +1,12 @@
+#spring.datasource.url=jdbc:postgresql:
+#spring.datasource.username=
+#spring.datasource.password=
+#spring.liquibase.change-log=classpath:
+#
+#telegram.bot.username=
+#telegram.bot.token=
+#
+#openai.api-key=
+#openai.base-url=
+#google.sheets.spreadsheet-id=
+#google.credentials.path=
