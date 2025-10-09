@@ -7,18 +7,11 @@ import com.autovoice.repository.BotUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class BotUserServiceImpl implements BotUserService {
 
     @Autowired
     private BotUserRepository botUserRepository;
-
-    @Override
-    public BotUser getByChatId(Long chatId) {
-        return botUserRepository.findByChatId(chatId).orElseThrow();
-    }
 
     @Override
     public boolean existsByChatId(Long chatId) {
@@ -27,7 +20,8 @@ public class BotUserServiceImpl implements BotUserService {
 
     @Override
     public void saveRole(long chatId, Role role) {
-        BotUser botUser = botUserRepository.findByChatId(chatId).orElse(new  BotUser());
+        BotUser botUser = botUserRepository.findByChatId(chatId).orElse(new BotUser());
+
         if (botUser.getRole() == null) {
             botUser.setChatId(chatId);
             botUser.setRole(role);
@@ -37,18 +31,14 @@ public class BotUserServiceImpl implements BotUserService {
 
     @Override
     public void saveBranch(long chatId, Branch branch) {
-        BotUser botUser = botUserRepository.findByChatId(chatId).orElseThrow();
+        BotUser botUser = botUserRepository.findByChatId(chatId)
+                .orElseGet(() -> {
+                    BotUser newUser = new BotUser();
+                    newUser.setChatId(chatId);
+                    return newUser;
+                });
+
         botUser.setBranch(branch);
         botUserRepository.save(botUser);
-    }
-
-    @Override
-    public void save(BotUser botUser) {
-        botUserRepository.save(botUser);
-    }
-
-    @Override
-    public Role hasRole(Long chatId) {
-        return botUserRepository.findByChatId(chatId).map(BotUser::getRole).orElse(null);
     }
 }

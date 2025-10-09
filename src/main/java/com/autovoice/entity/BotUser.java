@@ -3,7 +3,6 @@ package com.autovoice.entity;
 import com.autovoice.enums.Branch;
 import com.autovoice.enums.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

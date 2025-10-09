@@ -18,7 +18,6 @@ public class TelegramBotInitializer {
     public TelegramBotsApi telegramBotsApi() throws Exception {
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
         botsApi.registerBot(autoVoiceBot);
-        System.out.println("✅ Bot registered successfully!");
         return botsApi;
     }
 }

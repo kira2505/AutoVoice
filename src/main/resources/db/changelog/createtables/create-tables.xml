@@ -24,10 +24,7 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="title" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="TEXT">
+            <column name="message" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="sentiment" type="VARCHAR(50)"/>
@@ -38,6 +35,9 @@
                              references="bot_users(id)"/>
             </column>
             <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="chat_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 

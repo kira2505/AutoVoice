@@ -1,7 +1,6 @@
 package com.autovoice.handler;
 
 import com.autovoice.enums.Branch;
-import com.autovoice.enums.RegistrationStep;
 import com.autovoice.enums.Role;
 import com.autovoice.service.BotUserServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
@@ -21,16 +18,7 @@ public class RegistrationHandler {
 
     private final BotUserServiceImpl botUserService;
 
-    private final Map<Long, RegistrationStep> registrationStep = new ConcurrentHashMap<>();
-
     public SendMessage createRoleSelectionMessage(Long chatId) {
-        if(botUserService.existsByChatId(chatId) && botUserService.hasRole(chatId) != null) {
-            SendMessage message = new SendMessage();
-            message.setChatId(chatId.toString());
-            message.setText("You have already selected a role 👌");
-            return message;
-        }
-        registrationStep.put(chatId, RegistrationStep.ASK_ROLE);
         return createSelectionMessage(chatId, "\uD83D\uDC64 Select your role: ", Role.values());
     }
 
@@ -39,29 +27,25 @@ public class RegistrationHandler {
         message.setChatId(chatId.toString());
 
         try {
-            try {
-                Role role = Role.valueOf(data);
+            Role role = findByNameOrDisplayName(data, Role.values());
+            if (role != null) {
                 botUserService.saveRole(chatId, role);
-
-                message = createSelectionMessage(chatId, "\uD83C\uDFE2 Select your branch: ",  Branch.values());
-                return message;
-            } catch (IllegalArgumentException e) {
-                try {
-                    Branch branch = Branch.valueOf(data);
-                    botUserService.saveBranch(chatId, branch);
-
-                    SendMessage completed = new SendMessage();
-                    completed.setChatId(chatId.toString());
-                    message.setText("✅ Registration completed! Use the menu below \uD83D\uDC47");
-                    return completed;
-                } catch (IllegalArgumentException ex) {
-                    message.setText("Wrong choice: " + data);
-                    return message;
-                }
+                return createSelectionMessage(chatId, "\uD83C\uDFE2 Select your branch: ", Branch.values());
             }
+
+            Branch branch = findByNameOrDisplayName(data, Branch.values());
+            if (branch != null) {
+                botUserService.saveBranch(chatId, branch);
+                message.setText("✅ Registration completed! Use the menu below \uD83D\uDC47");
+                return message;
+            }
+
+            message.setText("❌ Wrong choice: " + data);
+            return message;
+
         } catch (Exception e) {
             e.printStackTrace();
-            message.setText("An error occurred while processing your selection.");
+            message.setText("⚠️ An error occurred while processing your selection.");
             return message;
         }
     }
@@ -92,5 +76,25 @@ public class RegistrationHandler {
         markup.setKeyboard(rows);
         message.setReplyMarkup(markup);
         return message;
+    }
+
+    private <T extends Enum<T>> T findByNameOrDisplayName(String data, T[] values) {
+        for (T value : values) {
+            if (value.name().equalsIgnoreCase(data)) {
+                return value;
+            }
+
+            String displayName = null;
+            if (value instanceof Role role) {
+                displayName = role.getDisplayName();
+            } else if (value instanceof Branch branch) {
+                displayName = branch.getDisplayName();
+            }
+
+            if (displayName != null && displayName.equalsIgnoreCase(data)) {
+                return value;
+            }
+        }
+        return null;
     }
 }
