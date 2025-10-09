@@ -53,7 +53,7 @@ public class AutoVoiceBot extends TelegramLongPollingBot {
 
             if (update.hasMessage() && update.getMessage().isReply()) {
                 String replyToText = update.getMessage().getReplyToMessage().getText();
-                if ("✍️ Напишите ваш отзыв:".equals(replyToText)) {
+                if ("✍️ Write your feedback:".equals(replyToText)) {
                     String feedbackText = update.getMessage().getText();
                     Feedback feedback = feedbackHandler.handleNewFeedback(chatId, feedbackText);
                     String response = String.format(
@@ -71,9 +71,10 @@ public class AutoVoiceBot extends TelegramLongPollingBot {
                 case "/start": {
                     if (!botUserService.existsByChatId(chatId)) {
                         executeMessage(registrationHandler.createRoleSelectionMessage(chatId));
+                        return;
                     }
 
-                    SendMessage message = new SendMessage(chatId.toString(), "\uD83D\uDCCB Main menu: ");
+                    SendMessage message = new SendMessage(chatId.toString(), "");
                     message.setReplyMarkup(createPersistentKeyboard());
                     executeMessage(message);
                     break;
@@ -91,7 +92,7 @@ public class AutoVoiceBot extends TelegramLongPollingBot {
                     break;
                 }
                 case "\uFE0F Write feedback": {
-                    SendMessage askFeedback = new SendMessage(chatId.toString(), "✍️ Напишите ваш отзыв:");
+                    SendMessage askFeedback = new SendMessage(chatId.toString(), "✍️ Write your feedback:");
                     ForceReplyKeyboard forceReply = new ForceReplyKeyboard();
                     forceReply.setSelective(true);
                     askFeedback.setReplyMarkup(forceReply);

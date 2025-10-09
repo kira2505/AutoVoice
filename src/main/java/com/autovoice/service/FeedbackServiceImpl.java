@@ -5,19 +5,18 @@ import com.autovoice.entity.Feedback;
 import com.autovoice.enums.Sentiment;
 import com.autovoice.repository.BotUserRepository;
 import com.autovoice.repository.FeedbackRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FeedbackServiceImpl implements FeedbackService {
 
-    @Autowired
-    private FeedbackRepository feedbackRepository;
+    private final FeedbackRepository feedbackRepository;
 
-    @Autowired
-    private BotUserRepository botUserRepository;
+    private final BotUserRepository botUserRepository;
 
     @Override
     public Feedback saveFeedback(Long chatId, String message, Sentiment sentiment, int criticalLevel, String solution) {
@@ -36,6 +35,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         return feedbackRepository.save(feedback);
     }
 
+    @Override
     public List<Feedback> findByChatId(Long chatId) {
         return feedbackRepository.findByChatId(chatId);
     }

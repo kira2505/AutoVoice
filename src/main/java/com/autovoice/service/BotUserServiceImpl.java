@@ -2,16 +2,16 @@ package com.autovoice.service;
 
 import com.autovoice.entity.BotUser;
 import com.autovoice.enums.Branch;
-import com.autovoice.enums.Role;
+import com.autovoice.enums.Position;
 import com.autovoice.repository.BotUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class BotUserServiceImpl implements BotUserService {
 
-    @Autowired
-    private BotUserRepository botUserRepository;
+    private final BotUserRepository botUserRepository;
 
     @Override
     public boolean existsByChatId(Long chatId) {
@@ -19,12 +19,12 @@ public class BotUserServiceImpl implements BotUserService {
     }
 
     @Override
-    public void saveRole(long chatId, Role role) {
+    public void savePosition(long chatId, Position position) {
         BotUser botUser = botUserRepository.findByChatId(chatId).orElse(new BotUser());
 
-        if (botUser.getRole() == null) {
+        if (botUser.getPosition() == null) {
             botUser.setChatId(chatId);
-            botUser.setRole(role);
+            botUser.setPosition(position);
             botUserRepository.save(botUser);
         }
     }

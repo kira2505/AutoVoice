@@ -1,7 +1,7 @@
 package com.autovoice.handler;
 
 import com.autovoice.enums.Branch;
-import com.autovoice.enums.Role;
+import com.autovoice.enums.Position;
 import com.autovoice.service.BotUserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class RegistrationHandler {
     private final BotUserServiceImpl botUserService;
 
     public SendMessage createRoleSelectionMessage(Long chatId) {
-        return createSelectionMessage(chatId, "\uD83D\uDC64 Select your role: ", Role.values());
+        return createSelectionMessage(chatId, "\uD83D\uDC64 Select your position: ", Position.values());
     }
 
     public SendMessage handleCallback(Long chatId, String data) {
@@ -27,9 +27,9 @@ public class RegistrationHandler {
         message.setChatId(chatId.toString());
 
         try {
-            Role role = findByNameOrDisplayName(data, Role.values());
-            if (role != null) {
-                botUserService.saveRole(chatId, role);
+            Position position = findByNameOrDisplayName(data, Position.values());
+            if (position != null) {
+                botUserService.savePosition(chatId, position);
                 return createSelectionMessage(chatId, "\uD83C\uDFE2 Select your branch: ", Branch.values());
             }
 
@@ -62,8 +62,8 @@ public class RegistrationHandler {
             InlineKeyboardButton button = new InlineKeyboardButton();
 
             String displayName;
-            if (value instanceof Role) {
-                displayName = ((Role) value).getDisplayName();
+            if (value instanceof Position) {
+                displayName = ((Position) value).getDisplayName();
             } else {
                 displayName = ((Branch) value).getDisplayName();
             }
@@ -85,7 +85,7 @@ public class RegistrationHandler {
             }
 
             String displayName = null;
-            if (value instanceof Role role) {
+            if (value instanceof Position role) {
                 displayName = role.getDisplayName();
             } else if (value instanceof Branch branch) {
                 displayName = branch.getDisplayName();

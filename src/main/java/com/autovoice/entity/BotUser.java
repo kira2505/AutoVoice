@@ -1,7 +1,7 @@
 package com.autovoice.entity;
 
 import com.autovoice.enums.Branch;
-import com.autovoice.enums.Role;
+import com.autovoice.enums.Position;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +23,7 @@ public class BotUser {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Position position;
 
     @Enumerated(EnumType.STRING)
     private Branch branch;
